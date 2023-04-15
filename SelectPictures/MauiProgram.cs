@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using SelectPictures.Data;
-
+﻿
 namespace SelectPictures;
 
 public static class MauiProgram
@@ -13,13 +11,13 @@ public static class MauiProgram
             .ConfigureFonts(fonts => { fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"); });
 
         builder.Services.AddMauiBlazorWebView();
-
+        builder.Services.AddBootstrapBlazor();
+        
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
         builder.Logging.AddDebug();
 #endif
 
-        builder.Services.AddSingleton<WeatherForecastService>();
 
         return builder.Build();
     }
