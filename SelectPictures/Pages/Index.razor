@@ -1,7 +1,57 @@
 ﻿@page "/"
+@using SelectPictures.Data
 
-Welcome to your new app.
+<img src="@_selectedPicture.Source" class="img-fluid" style="max-width: 60%; height: auto;" />
 
-<SurveyPrompt Title="How is Blazor working for you?"/>
+<div class="card-group card-group-scroll">
+    @foreach (var picture in _pictures)
+    {
+        <div class="" @onclick="args => SelectePicture(picture)">
+            <img src="@picture.Source" class="img-fluid @(picture.IsDeleted ? "isDeleted" : "")" style="max-width: 200px; height: auto;"/>
+            @* <div class="card-body"> *@
+            @*     <h5 class="card-title">@picture.FileName</h5> *@
+            @*     <button  *@
+            @*         type="button" *@
+            @*         class="btn btn-delete" *@
+            @*         @onclick="args => DeletePicture(picture)">Click me</button> *@
+            @* *@
+            @* </div> *@
+        </div>
+    }
+</div>
 
-<ImagesList></ImagesList>
+@code {
+
+    private Picture _selectedPicture;
+    private Picture[] _pictures = {};
+    
+    protected override void OnInitialized()
+    {
+        var service = new ImagesService();
+        _pictures = service.GetPictures();
+        _selectedPicture = _pictures.First();
+        
+        foreach (var picture in _pictures)
+        {
+            picture.SetSource(GetImageBytes(picture.Url));
+        }
+    }
+
+    private string GetImageBytes(string source)
+    {
+        var imageBytes  = File.ReadAllBytes(source);
+        return $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
+    }
+
+    private void SelectePicture(Picture picture)
+    {
+        _selectedPicture = picture;
+    }
+    
+    private void DeletePicture(Picture picture)
+    {
+        picture.SetDelete(!picture.IsDeleted);
+    }
+
+}
+

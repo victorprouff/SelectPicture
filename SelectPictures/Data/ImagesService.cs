@@ -2,10 +2,6 @@ namespace SelectPictures.Data;
 
 public class ImagesService
 {
-    public ImagesService()
-    {
-        
-    }
     public Picture[] GetPictures()
     {
         
