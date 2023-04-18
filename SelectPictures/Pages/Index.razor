@@ -1,41 +1,65 @@
 ﻿@page "/"
 @using SelectPictures.Data
 
-<img src="@_selectedPicture.Source" class="img-fluid" style="max-width: 60%; height: auto;" />
+<div class="row">
+    <div class="col-10 card fixed-top">
+        <div class="card-body">
+            <img src="@_selectedPicture.Source" class="img-fluid" style="max-height: 80%; width: auto; margin-bottom: 250px"/>
 
-<div class="card-group card-group-scroll">
-    @foreach (var picture in _pictures)
-    {
-        <div class="" @onclick="args => SelectePicture(picture)">
-            <img src="@picture.Source" class="img-fluid @(picture.IsDeleted ? "isDeleted" : "")" style="max-width: 200px; height: auto;"/>
-            @* <div class="card-body"> *@
-            @*     <h5 class="card-title">@picture.FileName</h5> *@
-            @*     <button  *@
-            @*         type="button" *@
-            @*         class="btn btn-delete" *@
-            @*         @onclick="args => DeletePicture(picture)">Click me</button> *@
-            @* *@
-            @* </div> *@
         </div>
-    }
+    </div>
+    <div class="col-2">
+        <h5 class="card-title">@_selectedPicture.FileName</h5>
+        <button
+            type="button"
+            class="btn btn-delete"
+            @onclick="args => DeletePicture(_selectedPicture)">Delete</button>
+    </div>
 </div>
+
+
+<div class="row">
+    <div class="col card-group card-group-scroll fixed-bottom">
+        @foreach (var picture in _pictures)
+        {
+            <div class="card text-center" @onclick="args => SelectPicture(picture)" style="max-width: 250px;">
+                <div class="card-body img">
+                    <img src="@picture.Source" class="img-fluid img-thumbnail @(picture.IsDeleted ? "isDeleted" : "")" style="max-width: 200px; height: auto;"/>
+
+
+
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
 
 @code {
 
     private Picture _selectedPicture;
     private Picture[] _pictures = {};
     
-    protected override void OnInitialized()
+    protected override async void OnInitialized()
     {
         var service = new ImagesService();
         _pictures = service.GetPictures();
         _selectedPicture = _pictures.First();
         
-        foreach (var picture in _pictures)
-        {
-            picture.SetSource(GetImageBytes(picture.Url));
-        }
+        // Parallel.ForEach(_pictures, SetSourceAsync);
+        
+        
+        // foreach (var picture in _pictures)
+        // {
+        //     picture.SetSource(GetImageBytes(picture.Url));
+        // }
     }
+
+    // private async void SetSourceAsync(Picture picture)
+    // {
+    //     picture.SetSource(await GetImageBytes(picture.Url));
+    // }
 
     private string GetImageBytes(string source)
     {
@@ -43,7 +67,13 @@
         return $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
     }
 
-    private void SelectePicture(Picture picture)
+    // private async Task<string> GetImageBytes(string source)
+    // {
+    //     var imageBytes  = await File.ReadAllBytesAsync(source);
+    //     return $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}";
+    // }
+
+    private void SelectPicture(Picture picture)
     {
         _selectedPicture = picture;
     }
